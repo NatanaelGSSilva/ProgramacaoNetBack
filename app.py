@@ -42,8 +42,9 @@ class Veiculo(db.Model):
 @app.route('/veiculos')
 @cross_origin()
 def cadastro():
-    # obtém todos os registros da tabela filmes
-    veiculos = Veiculo.query.all()
+    # obtém todos os registros da tabela veiculos em ordem de preço
+    # veiculos = Veiculo.query.order_by(Veiculo.marca).all() #primeira coisa que mudei da aula
+    veiculos = Veiculo.query.all() #primeira coisa que mudei da aula
     # converte a lista de veiculos para o formato JSON
     return jsonify([veiculo.to_json() for veiculo in veiculos])
 
@@ -96,6 +97,16 @@ def exclui(id):
     Veiculo.query.filter_by(id=id).delete()
     db.session.commit()
     return jsonify({'id': id, 'message': 'Veiculo excluído com sucesso'}), 200
+
+
+@app.route('/veiculos/pesq/<palavra>')
+@cross_origin()
+def pesquisa(palavra):
+    # obtém todos os registros da tabela veiculos em ordem de preço
+    # veiculos = Veiculo.query.order_by(Veiculo.marca).filter(Veiculo.marca.like(f'%{palavra}%')).all() #primeira coisa que mudei da aula
+    veiculos = Veiculo.query.filter(Veiculo.modelo.like(f'%{palavra}%')).all() #primeira coisa que mudei da aula
+    # converte a lista de veiculos para o formato JSON
+    return jsonify([veiculo.to_json() for veiculo in veiculos])
 
 
 @app.route('/')
