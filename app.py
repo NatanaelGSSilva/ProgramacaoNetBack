@@ -42,6 +42,7 @@ class Veiculo(db.Model):
 @app.route('/veiculos')
 @cross_origin()
 def cadastro():
+
     # obtém todos os registros da tabela veiculos em ordem de preço
     # veiculos = Veiculo.query.order_by(Veiculo.marca).all() #primeira coisa que mudei da aula
     veiculos = Veiculo.query.all() #primeira coisa que mudei da aula
@@ -53,9 +54,20 @@ def cadastro():
 @cross_origin()
 def inclusao():
     veiculo = Veiculo.from_json(request.json)
+
+    #if '' or 0 in veiculo.to_json().values()
+    # list comprehensions
+    erros = [campo for campo, valor in veiculo.to_json().items()
+             if valor == '' or valor == 0]
+
+     # em Python, JS... 0 => False; qualquer valor (exceto 0) => True
+    if len(erros):
+        return jsonify({'id': 0, 'message': ','.join(erros) + ' deve(m) ser preenchido(s)'}), 400
+
     db.session.add(veiculo)
     db.session.commit()
     return jsonify(veiculo.to_json()), 201
+
 
     
 @app.errorhandler(404)
