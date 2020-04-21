@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, request
 from flask_sqlalchemy import SQLAlchemy
 from flask_cors import CORS, cross_origin
+from sqlalchemy.sql.expression import func
 
 app = Flask(__name__)
 CORS(app)
@@ -119,6 +120,25 @@ def pesquisa(palavra):
     veiculos = Veiculo.query.filter(Veiculo.modelo.like(f'%{palavra}%')).all() #primeira coisa que mudei da aula
     # converte a lista de veiculos para o formato JSON
     return jsonify([veiculo.to_json() for veiculo in veiculos])
+
+@app.route('/veiculos/estatistica/total')
+@cross_origin()
+def totalVeiculos():
+    veiculos = Veiculo.query.count()
+    return jsonify({'total': veiculos})
+
+@app.route('/veiculos/estatistica/contagem/maior')
+@cross_origin()
+def contagemMaior():
+    veiculos = Veiculo.query.order_by(Veiculo.preco.desc()).limit(1).all()
+    return jsonify([veiculo.to_json() for veiculo in veiculos])
+
+@app.route('/veiculos/estatistica/contagem/menor')
+@cross_origin()
+def contagemMenor():
+    veiculos = Veiculo.query.order_by(Veiculo.preco.asc()).limit(1).all()
+    return jsonify([veiculo.to_json() for veiculo in veiculos])
+
 
 
 @app.route('/')
